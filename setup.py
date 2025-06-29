@@ -12,8 +12,6 @@ setup(
     author="Your Name",
     author_email="your.email@example.com",
     description="A FastAPI CRUD library with dependency injection",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
     url="https://github.com/yourusername/api-lib",
     packages=find_packages(),
     classifiers=[
