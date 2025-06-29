@@ -1,11 +1,10 @@
-from typing import Generic, TypeVar, Optional, List, Dict, Any
 from uuid import UUID
 from typing import Generic, TypeVar, Optional, List, Dict, Any, NamedTuple, Union
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy import and_, or_, func, asc, desc
+from sqlalchemy import and_, func, asc, desc
 
-from models import BaseModel
+from api_lib.models import BaseModel
 
 
 class PaginatedResult(NamedTuple):

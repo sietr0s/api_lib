@@ -1,7 +1,7 @@
 from typing import TypeVar, Type
 from pydantic import BaseModel
 
-from models.base import Base
+from api_lib.models.base import Base
 
 T = TypeVar('T', bound=Base)
 S = TypeVar('S', bound=BaseModel)

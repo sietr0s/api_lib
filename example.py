@@ -6,16 +6,16 @@ from uuid import UUID
 from fastapi import FastAPI, Depends, APIRouter
 from pydantic import BaseModel
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession
 
 # Импорт нашей библиотеки
-from models import BaseModel as SQLBaseModel, Base
-from repositories.base import BaseRepository
-from schemas import PaginatedSchema
-from services.base import BaseService
-from utils.auth import require_permission, ServicePermission, Permission
-from utils.crud import crud_routers
-from database import db_instance
+from api_lib.models import BaseModel as SQLBaseModel
+from api_lib.repositories import BaseRepository
+from api_lib.schemas import PaginatedSchema
+from api_lib.services import BaseService
+from api_lib.utils.auth import ServicePermission, Permission
+from api_lib.utils import crud_routers
+from api_lib.database import db_instance
 
 logging.basicConfig(level=logging.DEBUG)
 

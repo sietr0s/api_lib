@@ -6,11 +6,11 @@ from fastapi.params import Query
 from starlette import status
 from pydantic import BaseModel as PydanticBaseModel
 
-from services import BaseService
-from models import Base as BaseModel
-from schemas import PaginatedSchema
-from utils.auth import TokenData, require_permission, ServicePermission
-from utils.schema_convertor import SchemaConverter
+from api_lib.services import BaseService
+from api_lib.models import Base as BaseModel
+from api_lib.schemas import PaginatedSchema
+from api_lib.utils.auth import TokenData, require_permission, ServicePermission
+from api_lib.utils.schema_convertor import SchemaConverter
 
 S = TypeVar('S', bound=BaseService)
 M = TypeVar('M', bound=BaseModel)

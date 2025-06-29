@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Optional, List, Dict, Any
+from typing import Optional, List
 from enum import Enum
 
 import jwt
@@ -7,7 +7,7 @@ from fastapi import HTTPException, status, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
 
-from core.config import base_config
+from api_lib.core.config import base_config
 
 
 class Permission(str, Enum):

@@ -1,12 +1,11 @@
-import logging
 from typing import Generic, TypeVar, Optional, List, Dict, Any
 from uuid import UUID
 import logging
 
 from sqlalchemy.exc import NoResultFound
 
-from models.base import BaseModel
-from repositories.base import BaseRepository, PaginatedResult
+from api_lib.models.base import BaseModel
+from api_lib.repositories.base import BaseRepository, PaginatedResult
 
 T = TypeVar('T', bound=BaseModel)
 R = TypeVar('R', bound=BaseRepository)
