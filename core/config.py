@@ -1,8 +1,6 @@
 """Database configuration for domain layer"""
 
 from pydantic_settings import BaseSettings
-from typing import Optional
-import os
 
 
 class DatabaseConfig(BaseSettings):
@@ -42,11 +40,6 @@ class DatabaseConfig(BaseSettings):
             "test_mode": {"env": "TEST_MODE"}
         }
 
-    @classmethod
-    def from_env(cls) -> "DatabaseConfig":
-        """Create configuration from environment variables"""
-        return cls()
-
     def get_database_url(self) -> str:
         """Get database URL for SQLAlchemy"""
         if self.test_mode:
@@ -58,3 +51,17 @@ class DatabaseConfig(BaseSettings):
                 return f"{self.driver}://{self.username}:{self.password}@{self.host}:{self.port}/{self.database}"
             else:
                 return f"{self.driver}://{self.username}@{self.host}:{self.port}/{self.database}"
+
+
+class BaseConfig(BaseSettings):
+    secret_key: str = "your-secret-key-change-this-in-production"
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 30
+
+    class Config:
+        env_file = ".env"
+        case_sensitive = False
+
+
+database_config = DatabaseConfig()
+base_config = BaseConfig()

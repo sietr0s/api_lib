@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import (
 from sqlalchemy import text
 import logging
 
-from core.config import DatabaseConfig
+from core.config import DatabaseConfig, database_config
 from models import BaseModel
 
 logger = logging.getLogger(__name__)
@@ -21,7 +21,7 @@ class DatabaseInitializer:
     """Database initialization and management"""
 
     def __init__(self, config: Optional[DatabaseConfig] = None):
-        self.config = config or DatabaseConfig.from_env()
+        self.config = config
         self._engine: Optional[AsyncEngine] = None
         self._session_factory: Optional[async_sessionmaker[AsyncSession]] = None
 
@@ -125,4 +125,4 @@ class DatabaseInitializer:
 
 
 # Global database instance
-db_instance = DatabaseInitializer()
+db_instance = DatabaseInitializer(database_config)

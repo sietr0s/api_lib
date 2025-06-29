@@ -7,6 +7,8 @@ from fastapi import HTTPException, status, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
 
+from core.config import base_config
+
 
 class Permission(str, Enum):
     """Базовые разрешения системы"""
@@ -141,11 +143,10 @@ class JWTAuth:
         return permission_checker
 
 
-# Глобальный экземпляр (можно настроить через переменные окружения)
 jwt_auth = JWTAuth(
-    secret_key="your-secret-key-change-this-in-production",  # В продакшене использовать переменную окружения
-    algorithm="HS256",
-    access_token_expire_minutes=30
+    secret_key=base_config.secret_key,
+    algorithm=base_config.algorithm,
+    access_token_expire_minutes=base_config.access_token_expire_minutes
 )
 
 
