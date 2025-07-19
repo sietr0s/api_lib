@@ -6,13 +6,14 @@ from fastapi.params import Query
 from starlette import status
 from pydantic import BaseModel as PydanticBaseModel
 
-from api_lib.services import BaseService
+from api_lib.services import BaseService, BaseVersionalService
 from api_lib.models import Base as BaseModel
 from api_lib.schemas import PaginatedSchema
 from api_lib.utils.auth import TokenData, require_permission, ServicePermission
 from api_lib.utils.schema_convertor import SchemaConverter
 
 S = TypeVar('S', bound=BaseService)
+VS = TypeVar('VS', bound=BaseVersionalService)
 M = TypeVar('M', bound=BaseModel)
 LS = TypeVar('LS', bound=PaginatedSchema)
 SS = TypeVar('SS', bound=PydanticBaseModel)
@@ -20,7 +21,12 @@ CS = TypeVar('CS', bound=PydanticBaseModel)  # Create Schema
 US = TypeVar('US', bound=PydanticBaseModel)  # Update Schema
 
 
-def crud_routers(service_dependency: Callable[[], S],
+def permission_2_desc(permission: ServicePermission):
+    description = f"Permissions key: {permission.name}, {' or '.join(permission.permissions)}" if permission else ""
+    return description
+
+
+def crud_routers(service_dependency: Callable[[], S | VS],
                  router: APIRouter,
                  model: Type[M],
                  list_schema: Type[LS],
@@ -33,7 +39,10 @@ def crud_routers(service_dependency: Callable[[], S],
                  update_permissions: Optional[ServicePermission] = None,
                  delete_permission: Optional[ServicePermission] = None
                  ):
-    @router.get('/', response_model=list_schema, status_code=status.HTTP_200_OK)
+    @router.get('/',
+                response_model=list_schema,
+                status_code=status.HTTP_200_OK,
+                description=permission_2_desc(read_permission))
     async def get_list(
             page: int = Query(1, ge=1, description="Page number"),
             page_size: int = Query(20, ge=1, le=100, description="Items per page"),
@@ -47,7 +56,11 @@ def crud_routers(service_dependency: Callable[[], S],
                                   page=page,
                                   page_size=page_size)
 
-    @router.get('/{id}', response_model=single_schema, status_code=status.HTTP_200_OK)
+    @router.get('/{id}',
+                response_model=single_schema,
+                status_code=status.HTTP_200_OK,
+                description=permission_2_desc(read_permission)
+                )
     async def get_single(id: UUID,
                          service: S = Depends(service_dependency),
                          current_user: Optional[TokenData] = Depends(require_permission(read_permission))):
@@ -59,14 +72,20 @@ def crud_routers(service_dependency: Callable[[], S],
             )
         return result
 
-    @router.post('/', response_model=single_schema, status_code=status.HTTP_201_CREATED)
+    @router.post('/',
+                 response_model=single_schema,
+                 status_code=status.HTTP_201_CREATED,
+                 description=permission_2_desc(create_permission))
     async def create(data: create_schema,
                      service: S = Depends(service_dependency),
                      current_user: Optional[TokenData] = Depends(require_permission(create_permission))):
         data_model = SchemaConverter.schema_to_model(data, model)
         return await service.create(data_model)
 
-    @router.put('/{id}', response_model=single_schema, status_code=status.HTTP_200_OK)
+    @router.put('/{id}',
+                response_model=single_schema,
+                status_code=status.HTTP_200_OK,
+                description=permission_2_desc(update_permissions))
     async def update(id: UUID,
                      data: update_schema,
                      service: S = Depends(service_dependency),
@@ -78,9 +97,13 @@ def crud_routers(service_dependency: Callable[[], S],
                 detail=f"{entity_name} not found"
             )
         data_model = SchemaConverter.schema_to_model(data, model, id=id)
+        if getattr(service, "versional_update"):
+            return await service.versional_update(data_model)
         return await service.update(data_model)
 
-    @router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
+    @router.delete('/{id}',
+                   status_code=status.HTTP_204_NO_CONTENT,
+                   description=permission_2_desc(delete_permission))
     async def delete(id: UUID,
                      service: S = Depends(service_dependency),
                      current_user: Optional[TokenData] = Depends(require_permission(delete_permission))):

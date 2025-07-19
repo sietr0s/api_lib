@@ -48,7 +48,7 @@ class BaseRepository(Generic[T]):
             return await self._paginate_query(query, page, page_size)
 
         result = await self.session.execute(query)
-        return result.scalars().all()
+        return result.unique().scalars().all()
 
     async def get_filtered(self,
                            filters: Dict[str, Any],
@@ -100,7 +100,7 @@ class BaseRepository(Generic[T]):
             return await self._paginate_query(query, page, page_size)
 
         result = await self.session.execute(query)
-        return result.scalars().all()
+        return result.unique().scalars().all()
 
     async def add(self, entity: T) -> T:
         """Добавить новую сущность"""
@@ -174,7 +174,7 @@ class BaseRepository(Generic[T]):
         # Применение LIMIT и OFFSET
         paginated_query = query.offset(offset).limit(page_size)
         result = await self.session.execute(paginated_query)
-        items = result.scalars().all()
+        items = result.unique().scalars().all()
 
         return PaginatedResult(
             items=items,
